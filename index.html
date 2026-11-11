@@ -1,1 +1,508 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Student Productivity Dashboard</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f5fb;
+  color: #18213b;
+}
+
+header {
+  background: linear-gradient(120deg,#111b43,#4934a5);
+  color: white;
+  padding: 30px 7%;
+}
+
+header h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+header p {
+  color: #d8dcff;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.welcome {
+  margin-bottom: 24px;
+}
+
+.welcome h2 {
+  margin-bottom: 7px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.stat, .panel {
+  background: white;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 4px 18px rgba(20,30,70,.06);
+}
+
+.stat h3 {
+  color: #777f98;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.stat strong {
+  font-size: 30px;
+  color: #513ac5;
+}
+
+.panel {
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  margin-bottom: 18px;
+  font-size: 19px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 10px;
+}
+
+input, select {
+  padding: 12px;
+  border: 1px solid #dce0ed;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 0;
+  background: white;
+}
+
+button {
+  background: #573cc9;
+  color: white;
+  border: none;
+  padding: 12px 17px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #3924a0;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.filters button {
+  background: #eeeafb;
+  color: #513ac5;
+}
+
+.filters button.active {
+  background: #573cc9;
+  color: white;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #edf0f6;
+}
+
+.task:last-child {
+  border-bottom: none;
+}
+
+.task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-info h3 {
+  font-size: 15px;
+  margin-bottom: 7px;
+  overflow-wrap: anywhere;
+}
+
+.task-info p {
+  font-size: 12px;
+  color: #82899c;
+}
+
+.task.done h3 {
+  text-decoration: line-through;
+  color: #9299aa;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  margin-top: 7px;
+  background: #eeeafb;
+  color: #573cc9;
+}
+
+.task-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.task-actions button {
+  padding: 9px 11px;
+  font-size: 12px;
+}
+
+.delete {
+  background: #ffe9e9;
+  color: #d63838;
+}
+
+.delete:hover {
+  background: #ffd5d5;
+}
+
+.progress-bg {
+  height: 13px;
+  background: #ececf5;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#6042d4,#22b99a);
+  transition: width .3s;
+}
+
+.empty {
+  text-align: center;
+  color: #9097aa;
+  padding: 30px 0;
+}
+
+footer {
+  text-align: center;
+  color: #82899c;
+  padding: 25px;
+  font-size: 13px;
+}
+
+@media(max-width:700px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .task {
+    align-items: flex-start;
+  }
+
+  .task-actions {
+    flex-direction: column;
+  }
+
+  header h1 {
+    font-size: 23px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎓 Smart Student Dashboard</h1>
+  <p>Your personal study planner and productivity tracker</p>
+</header>
+
+<main class="container">
+
+  <section class="welcome">
+    <h2>Welcome, Student! 👋</h2>
+    <p id="today"></p>
+  </section>
+
+  <section class="stats">
+
+    <div class="stat">
+      <h3>Total Tasks</h3>
+      <strong id="total">0</strong>
+    </div>
+
+    <div class="stat">
+      <h3>Completed Tasks</h3>
+      <strong id="completed">0</strong>
+    </div>
+
+    <div class="stat">
+      <h3>Pending Tasks</h3>
+      <strong id="pending">0</strong>
+    </div>
+
+  </section>
+
+  <section class="panel">
+    <h2>📊 Your Productivity</h2>
+    <p id="percentage">0% completed</p>
+    <div class="progress-bg">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>➕ Add a New Study Task</h2>
+
+    <form id="taskForm">
+
+      <input
+        type="text"
+        id="taskName"
+        placeholder="Enter your task name"
+        maxlength="100"
+        required
+      >
+
+      <select id="priority">
+        <option value="High">High Priority</option>
+        <option value="Medium" selected>Medium Priority</option>
+        <option value="Low">Low Priority</option>
+      </select>
+
+      <input type="date" id="dueDate" required>
+
+      <button type="submit">Add Task +</button>
+
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>📚 My Study Tasks</h2>
+
+    <div class="filters">
+      <button class="active" data-filter="all">All Tasks</button>
+      <button data-filter="pending">Pending</button>
+      <button data-filter="completed">Completed</button>
+    </div>
+
+    <div id="taskList"></div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Smart Student Productivity Dashboard</p>
+  <p>Developed using HTML, CSS & JavaScript</p>
+  <p>© 2026 Student Project</p>
+</footer>
+
+<script>
+let tasks = [];
+
+try {
+  tasks = JSON.parse(
+    localStorage.getItem("studentTasks")
+  ) || [];
+} catch(error) {
+  tasks = [];
+}
+
+let currentFilter = "all";
+
+document.getElementById("today").textContent =
+  new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+document.getElementById("dueDate").value =
+  new Date().toLocaleDateString("en-CA");
+
+function saveTasks() {
+  localStorage.setItem(
+    "studentTasks",
+    JSON.stringify(tasks)
+  );
+}
+
+function addTask(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("taskName").value.trim();
+  const priority = document.getElementById("priority").value;
+  const dueDate = document.getElementById("dueDate").value;
+
+  if (!name || !dueDate) return;
+
+  tasks.push({
+    id: Date.now().toString() + Math.random().toString(36).slice(2),
+    name,
+    priority,
+    dueDate,
+    completed: false
+  });
+
+  saveTasks();
+  document.getElementById("taskForm").reset();
+  document.getElementById("dueDate").value =
+    new Date().toLocaleDateString("en-CA");
+
+  render();
+}
+
+function toggleTask(id) {
+  tasks = tasks.map(task =>
+    task.id === id
+      ? {...task, completed: !task.completed}
+      : task
+  );
+
+  saveTasks();
+  render();
+}
+
+function deleteTask(id) {
+  if (!confirm("Are you sure you want to delete this task?")) {
+    return;
+  }
+
+  tasks = tasks.filter(task => task.id !== id);
+  saveTasks();
+  render();
+}
+
+function render() {
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.completed).length;
+  const pending = total - completed;
+  const percent = total
+    ? Math.round(completed / total * 100)
+    : 0;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("completed").textContent = completed;
+  document.getElementById("pending").textContent = pending;
+  document.getElementById("percentage").textContent =
+    percent + "% completed";
+
+  document.getElementById("progress").style.width =
+    percent + "%";
+
+  const list = document.getElementById("taskList");
+
+  const filtered = tasks.filter(task => {
+    if (currentFilter === "pending") return !task.completed;
+    if (currentFilter === "completed") return task.completed;
+    return true;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML =
+      '<div class="empty">No tasks found. Add a new study task! ✨</div>';
+    return;
+  }
+
+  list.innerHTML = "";
+
+  filtered.forEach(task => {
+    const item = document.createElement("div");
+    item.className = "task" + (task.completed ? " done" : "");
+
+    const info = document.createElement("div");
+    info.className = "task-info";
+
+    const title = document.createElement("h3");
+    title.textContent = task.name;
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Due: " + task.dueDate + " | Priority: " + task.priority;
+
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = task.completed
+      ? "Completed"
+      : "Pending";
+
+    info.append(title, details, tag);
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = task.completed ? "Undo" : "Complete";
+    completeBtn.addEventListener("click", () =>
+      toggleTask(task.id)
+    );
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () =>
+      deleteTask(task.id)
+    );
+
+    actions.append(completeBtn, deleteBtn);
+    item.append(info, actions);
+    list.appendChild(item);
+  });
+}
+
+document.getElementById("taskForm")
+  .addEventListener("submit", addTask);
+
+document.querySelectorAll(".filters button")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      currentFilter = button.dataset.filter;
+
+      document.querySelectorAll(".filters button")
+        .forEach(b => b.classList.remove("active"));
+
+      button.classList.add("active");
+      render();
+    });
+  });
+
+render();
+</script>
+
+</body>
+</html>
+
